@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>귤을 싸자</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍊%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --orange:#f28c28; --orange-d:#d9731a; --orange-l:#fff3e3; --orange-b:#fbd5a5;
+  --bg:#faf7f2; --card:#fff; --text:#2d2a26; --muted:#7a736a; --line:#e8e1d6;
+  --ok:#2e7d32; --ok-bg:#e8f5e9; --bad:#c62828; --bad-bg:#fdecea; --warn:#b26a00; --warn-bg:#fff4d6;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 -apple-system,"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+header.top{background:var(--card);border-bottom:3px solid var(--orange);padding:12px 16px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 16px}
+.titlebar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+h1{margin:0;font-size:24px}
+h1 span{color:var(--orange)}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--orange-l);border:1px solid var(--orange-b);border-radius:var(--radius);padding:6px 14px;min-width:92px;text-align:center}
+.stat b{display:block;font-size:20px;line-height:1.2}
+.stat small{color:var(--muted)}
+.stat.ok b{color:var(--ok)} .stat.bad b{color:var(--bad)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.btn{border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#f6f1e9}
+.btn.primary{background:var(--orange);border-color:var(--orange-d);color:#fff;font-weight:600}
+.btn.primary:hover{background:var(--orange-d)}
+.btn.danger{color:var(--bad);border-color:#efb7b2}
+.btn.sm{padding:4px 10px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+.spacer{flex:1}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
+.filters .search{grid-column:1/-1}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+input[type=text],input[type=date],input[type=password],input[type=search],select,textarea{border:1px solid #d5ccbd;border-radius:8px;padding:8px 10px;background:#fff;width:100%}
+textarea{resize:vertical}
+.count{margin:6px 2px 8px;color:var(--muted);font-size:14px}
+.count b{color:var(--text)}
+.tablebox{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+table{border-collapse:collapse;width:100%}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--orange-l);font-size:13px;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.addr{max-width:260px}
+.clip{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.clip.open{white-space:pre-wrap;word-break:break-all}
+.badge{display:inline-block;padding:1px 9px;border-radius:99px;font-size:13px;font-weight:600}
+.badge.paid{background:var(--ok-bg);color:var(--ok)} .badge.unpaid{background:var(--bad-bg);color:var(--bad)}
+.empty{padding:40px 16px;text-align:center;color:var(--muted)}
+.pager{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.pager select{width:auto}
+dialog{border:0;border-radius:14px;padding:0;width:min(760px,calc(100vw - 20px));max-height:calc(100vh - 20px);box-shadow:0 10px 40px rgba(0,0,0,.3)}
+dialog.wide{width:min(980px,calc(100vw - 20px))}
+dialog::backdrop{background:rgba(40,30,20,.5)}
+.dhead{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--orange-l);position:sticky;top:0;z-index:2}
+.dhead h2{margin:0;font-size:18px}
+.dbody{padding:16px 18px;overflow:auto;max-height:calc(100vh - 150px)}
+.dfoot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--line);background:#fff;position:sticky;bottom:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2 .full{grid-column:1/-1}
+.err{background:var(--bad-bg);color:var(--bad);border-radius:8px;padding:8px 12px;margin-top:10px;white-space:pre-wrap}
+.note{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:8px 12px;margin:8px 0}
+.hint{color:var(--muted);font-size:13px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;background:#fffdfa}
+.card .head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.card pre{margin:0;white-space:pre-wrap;word-break:break-all;background:#f4efe6;border-radius:6px;padding:6px 8px;font-size:13px}
+.fld.missing input,.fld.missing select,.fld.missing textarea{border-color:var(--bad);background:var(--bad-bg)}
+.fld.warn input,.fld.warn select,.fld.warn textarea{border-color:#e0a030;background:var(--warn-bg)}
+.fld.default input,.fld.default select,.fld.default textarea{border-color:#7fa8d8;background:#eef5fd}
+.fld.default .msg{color:#2a62a8;font-weight:600}
+.fld .msg{font-size:12px;margin-top:2px}
+.badge.none{background:#eee;color:var(--muted)}
+.ptable td,.ptable th{padding:6px 6px}
+.ptable td.sub{background:#fffdfa}
+.ptable input,.ptable select,.ptable textarea{min-width:90px;padding:6px 8px}
+.ptable td.memo textarea{min-width:200px;resize:vertical}
+.ptable td.wide input{min-width:240px}
+.ptable td[data-l="연락처"] input{min-width:130px}
+.fld.missing .msg{color:var(--bad)} .fld.warn .msg{color:var(--warn)}
+.rowlist .r{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.rowlist .r input[type=text]{flex:1}
+.rowlist label{display:flex;align-items:center;gap:4px;font-size:13px;white-space:nowrap}
+.toasts{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:100;width:min(520px,calc(100vw - 24px))}
+.toast{background:#333;color:#fff;border-radius:8px;padding:10px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.toast.ok{background:var(--ok)} .toast.bad{background:var(--bad)}
+.toast button{background:rgba(255,255,255,.2);border:0;color:#fff;border-radius:6px;padding:3px 10px;cursor:pointer}
+#login{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+#login .box{background:#fff;border:1px solid var(--line);border-top:5px solid var(--orange);border-radius:14px;padding:26px;width:min(380px,100%)}
+#loading{padding:60px 16px;text-align:center;color:var(--muted)}
+.spin{display:inline-block;width:22px;height:22px;border:3px solid var(--orange-b);border-top-color:var(--orange);border-radius:50%;animation:sp .8s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (max-width:820px){
+  .grid2{grid-template-columns:1fr}
+  table,thead,tbody,tr,td{display:block}
+  thead{display:none}
+  tr{border-bottom:6px solid var(--bg);padding:8px 4px}
+  td{border:0;padding:3px 10px;display:flex;gap:10px}
+  td::before{content:attr(data-l);flex:0 0 78px;color:var(--muted);font-size:13px}
+  td.addr{max-width:none}
+  td>.clip,td>span,td>.fld{flex:1;min-width:0}
+  .ptable td.sub{display:block}
+  .ptable td.wide input,.ptable td.memo textarea{min-width:0}
+}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <form class="box" id="loginForm">
+    <h1><span>🍊</span> 귤을 싸자</h1>
+    <p class="hint">비밀번호를 입력해 주세요. (화면 잠금용이며 강력한 보안은 아닙니다)</p>
+    <label class="f">비밀번호<input type="password" id="loginPw" autocomplete="current-password" required></label>
+    <div id="loginErr" class="err" hidden role="alert"></div>
+    <p><button class="btn primary" style="width:100%" id="loginBtn">로그인</button></p>
+  </form>
+</div>
+
+<header class="top">
+  <div class="wrap titlebar">
+    <h1><span>🍊</span> 귤을 싸자</h1>
+    <div class="stats" aria-label="주문 현황">
+      <div class="stat"><b id="stTotal">-</b><small>전체 주문</small></div>
+      <div class="stat ok"><b id="stPaid">-</b><small>입금 완료</small></div>
+      <div class="stat bad"><b id="stUnpaid">-</b><small>미입금</small></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="actions">
+    <button class="btn primary" id="btnAdd">＋ 주문 추가</button>
+    <button class="btn primary" id="btnBulk">📋 텍스트 일괄 입력</button>
+    <button class="btn" id="btnExport">📥 엑셀 내보내기</button>
+    <span class="spacer"></span>
+    <button class="btn" id="btnRefresh" title="저장된 데이터를 다시 불러오기">↻ 새로고침</button>
+    <button class="btn" id="btnTrash">🗑 휴지통 <span id="trashCnt"></span></button>
+    <button class="btn" id="btnSettings">⚙ 설정</button>
+    <button class="btn" id="btnLogout">로그아웃</button>
+  </div>
+
+  <section class="panel" aria-label="검색 및 필터">
+    <div class="filters">
+      <label class="f search">검색 (이름·연락처·주소·상품명·보내는 분·메모)
+        <input type="search" id="q" placeholder="예: 김민수, 1234, 제주시, 한라봉">
+      </label>
+      <label class="f">입금 여부<select id="fPay"></select></label>
+      <label class="f">상품명<select id="fProd"></select></label>
+      <label class="f">상품 무게<select id="fWeight"></select></label>
+      <label class="f">등록일 (시작)<input type="date" id="fFrom"></label>
+      <label class="f">등록일 (종료)<input type="date" id="fTo"></label>
+      <button class="btn" id="btnReset">필터 초기화</button>
+    </div>
+  </section>
+
+  <div class="count" id="countLine" aria-live="polite"></div>
+  <div id="listArea"><div id="loading"><span class="spin"></span>주문을 불러오는 중…</div></div>
+  <div class="pager" id="pager"></div>
+</main>
+
+<!-- 주문 추가/수정 -->
+<dialog id="orderDlg">
+  <form method="dialog" id="orderForm" novalidate>
+    <div class="dhead"><h2 id="orderTitle">주문 추가</h2><button type="button" class="btn sm" data-close>닫기</button></div>
+    <div class="dbody">
+      <div class="grid2">
+        <label class="f">받는 분 성함 *<input type="text" id="oName" maxlength="40" autocomplete="off"></label>
+        <label class="f">받는 분 연락처 *<input type="text" id="oPhone" inputmode="tel" maxlength="16" placeholder="010-1234-5678" autocomplete="off"></label>
+        <label class="f full">주소 *<input type="text" id="oAddr" maxlength="200" autocomplete="off"></label>
+        <label class="f">상품명 *<select id="oProd"></select></label>
+        <label class="f">상품 무게 *<select id="oWeight"></select></label>
+        <label class="f">입금 여부 *<select id="oPay"></select></label>
+        <label class="f">보내는 분 (선택)<input type="text" id="oSender" maxlength="40" autocomplete="off"></label>
+        <label class="f full">메모 (선택) <span class="hint" id="oMemoCnt" style="margin-left:auto">0/500</span><textarea id="oMemo" rows="3" maxlength="500" placeholder="예: 부재 시 경비실에 맡겨 주세요"></textarea></label>
+      </div>
+      <div id="orderErr" class="err" hidden role="alert"></div>
+      <div id="orderConflict" class="note" hidden>
+        <div id="conflictMsg"></div>
+        <p style="margin:8px 0 0;display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn sm" id="btnLoadTheirs">상대방이 저장한 내용 불러오기</button>
+          <button type="button" class="btn sm danger" id="btnForce">내 내용으로 덮어쓰기</button>
+        </p>
+      </div>
+    </div>
+    <div class="dfoot">
+      <button type="button" class="btn" data-close>취소</button>
+      <button type="submit" class="btn primary" id="orderSave">저장</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- 텍스트 일괄 입력 -->
+<dialog id="bulkDlg" class="wide">
+  <div class="dhead"><h2>텍스트 일괄 입력</h2><button type="button" class="btn sm" data-close>닫기</button></div>
+  <div class="dbody">
+    <p class="hint">주문 정보를 붙여넣으세요. <b>메모:</b> / <b>비고:</b> / <b>요청사항:</b> 뒤의 내용은 메모로 분류됩니다. 여러 주문은 <b>빈 줄</b> 또는 <b>---</b> 줄로 구분하면 정확합니다. 분류 결과는 저장 전에 반드시 검토·수정할 수 있습니다.</p>
+    <textarea id="bulkText" rows="8" placeholder="받는 분: 김민수&#10;연락처: 010-1234-5678&#10;주소: 제주특별자치도 제주시 예시로 123&#10;상품: 귤&#10;무게: 5kg&#10;입금: 완료&#10;보내는 분: 이영희&#10;메모: 부재 시 경비실"></textarea>
+    <p style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn primary" id="btnParse">정보 자동 분류</button>
+      <button class="btn" id="btnSample">예시 넣기</button>
+      <button class="btn" id="btnBulkClear">비우기</button>
+    </p>
+    <div id="bulkPreview"></div>
+    <div id="bulkErr" class="err" hidden role="alert"></div>
+  </div>
+  <div class="dfoot">
+    <span class="hint" id="bulkSummary" style="align-self:center;margin-right:auto"></span>
+    <button type="button" class="btn" data-close>닫기</button>
+    <button type="button" class="btn primary" id="btnBulkSave" disabled>주문 저장</button>
+  </div>
+</dialog>
+
+<!-- 설정 -->
+<dialog id="setDlg">
+  <div class="dhead"><h2>설정</h2><button type="button" class="btn sm" data-close>닫기</button></div>
+  <div class="dbody" id="setBody"></div>
+  <div class="dfoot">
+    <button type="button" class="btn" data-close>취소</button>
+    <button type="button" class="btn primary" id="setSave">설정 저장</button>
+  </div>
+</dialog>
+
+<!-- 휴지통 -->
+<dialog id="trashDlg" class="wide">
+  <div class="dhead"><h2>휴지통</h2><button type="button" class="btn sm" data-close>닫기</button></div>
+  <div class="dbody" id="trashBody"></div>
+</dialog>
+
+<!-- 확인 -->
+<dialog id="confDlg">
+  <div class="dhead"><h2 id="confTitle">확인</h2></div>
+  <div class="dbody" id="confBody"></div>
+  <div class="dfoot">
+    <button type="button" class="btn" id="confNo">취소</button>
+    <button type="button" class="btn danger" id="confYes">확인</button>
+  </div>
+</dialog>
+
+<!-- 엑셀 -->
+<dialog id="expDlg">
+  <div class="dhead"><h2>엑셀 내보내기</h2><button type="button" class="btn sm" data-close>닫기</button></div>
+  <div class="dbody">
+    <p>이 브라우저에 저장된 <b>최신 데이터</b>를 기준으로 .xlsx 파일을 만듭니다.</p>
+    <p style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn primary" id="expAll">전체 주문 내보내기</button>
+      <button class="btn" id="expFiltered">현재 검색·필터 결과만 내보내기</button>
+    </p>
+    <p class="hint">다운로드가 끝나면 브라우저 하단/다운로드 폴더의 파일을 더블클릭하면 Excel(또는 호환 프로그램)에서 열립니다. 브라우저 보안상 Excel을 자동으로 실행할 수는 없습니다.</p>
+    <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+    <p><b>백업 / 복원</b><br><span class="hint">데이터는 이 브라우저에만 저장됩니다. 브라우저 데이터를 지우면 사라지므로 정기적으로 백업하세요.</span></p>
+    <p style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="bkSave">백업 파일 저장(JSON)</button><button class="btn" id="bkLoad">백업에서 복원…</button><input type="file" id="bkFile" accept=".json,application/json" hidden></p>
+    <div id="expErr" class="err" hidden role="alert"></div>
+  </div>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ==========================================================================
+   공통 도우미
+   ========================================================================== */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const kstDate = new Intl.DateTimeFormat('sv-SE', {timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit'});
+const kstDateTime = new Intl.DateTimeFormat('sv-SE', {timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23'});
+
+/*PARSER-START*/
+/* ==========================================================================
+   텍스트 자동 분류 (정규식·규칙 기반, 외부 API 없음)
+   ========================================================================== */
+const DEFAULT_PRODUCTS = ['귤', '한라봉', '레드향'];
+const MOBILE_RE = /(?<!\d)(?:\+?82[-.\s]?0?|0)1[016789][-.\s]?\d{3,4}[-.\s]?\d{4}(?!\d)/g;
+const LAND_RE = /(?<!\d)0(?:2|[3-6][1-5]|70)[-.\s]?\d{3,4}[-.\s]?\d{4}(?!\d)/g;
+const WEIGHT_RE = /(\d+(?:\.\d+)?)\s*(?:kg|㎏|키로그램|키로|킬로그램|킬로|k)(?![a-zA-Z])/i;
+const UNPAID_RE = /(?:아직\s*)?(?:미\s*입금|입금\s*전|입금\s*안\s*(?:함|했어요|했음|했습니다|됨|됐어요)?|입금\s*대기|입금\s*예정|미\s*결제|결제\s*전|결제\s*안\s*(?:함|했음)?|미\s*납|입금\s*필요)(?:\s*(?:입니다|이에요|이예요|예요|이요|임))?/;
+const PAID_RE = /입금\s*(?:완료|확인|됨|했(?:어요|습니다|음|어)?|끝)(?:\s*(?:입니다|이에요|예요|임))?|결제\s*완료|완납|입금(?![가-힣])/;
+const BOX_RE = /(?:\d+|한|두|세|네|일|이|삼|사|오)\s*(?:박스|box|상자|봉지|포대)(?:\s*(?:씩|입))?/gi; // 포장 수량: 무게와 별개이므로 버림
+const DEFAULT_PRODUCT = '귤';
+const DEFAULT_WEIGHT = '10kg';
+const SENDER_RE = /(?:보내는\s*(?:분|사람|이)|보내시는\s*분|보낸\s*(?:분|사람|이)|발송인)\s*(?:성함|이름)?\s*[:：]?\s*([가-힣]{2,5})(?=[\s,\/|;]|$)/;
+const REGION_RE = /^(서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)/;
+const ADDR_SUFFIX_RE = /(시|도|군|구|읍|면|동|리|로|길|가|호|층|번지|아파트|빌라|마을|단지|타워|센터|오피스텔|상가|주택|캠퍼스)$/;
+
+function normPhone(raw) {
+  let d = String(raw ?? '').replace(/\D/g, '');
+  if (d.startsWith('82') && d.length >= 11) d = '0' + d.slice(2);
+  if (/^01[016789]\d{7,8}$/.test(d)) return d.length === 11 ? `${d.slice(0,3)}-${d.slice(3,7)}-${d.slice(7)}` : `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
+  if (/^02\d{7,8}$/.test(d)) return `02-${d.slice(2, d.length - 4)}-${d.slice(-4)}`;
+  if (/^0\d{9,10}$/.test(d)) return `${d.slice(0,3)}-${d.slice(3, d.length - 4)}-${d.slice(-4)}`;
+  return null;
+}
+/** 입력 중 실시간 하이픈 */
+function livePhone(v) {
+  const d = String(v).replace(/\D/g, '').slice(0, 11);
+  if (d.startsWith('02')) { if (d.length <= 2) return d; if (d.length <= 5) return `${d.slice(0,2)}-${d.slice(2)}`; if (d.length <= 9) return `${d.slice(0,2)}-${d.slice(2, d.length-4)}-${d.slice(-4)}`; return `${d.slice(0,2)}-${d.slice(2,6)}-${d.slice(6,10)}`; }
+  if (d.length <= 3) return d;
+  if (d.length <= 7) return `${d.slice(0,3)}-${d.slice(3)}`;
+  if (d.length <= 10) return `${d.slice(0,3)}-${d.slice(3, d.length-4)}-${d.slice(-4)}`;
+  return `${d.slice(0,3)}-${d.slice(3,7)}-${d.slice(7)}`;
+}
+function findPhones(text) {
+  const found = [];
+  for (const re of [MOBILE_RE, LAND_RE]) {
+    re.lastIndex = 0;
+    let m;
+    while ((m = re.exec(text))) { const n = normPhone(m[0]); if (n) found.push({ raw: m[0], num: n }); }
+  }
+  return found;
+}
+function normWeight(text) {
+  const m = String(text).match(WEIGHT_RE);
+  return m ? `${parseFloat(m[1])}kg` : null;
+}
+const normKey = (s) => String(s).replace(/\s/g, '').toLowerCase();
+
+function labelKey(l) {
+  if (/메모|비고|요청/.test(l)) return 'memo';
+  if (/보내|발송|보낸/.test(l)) return 'sender';
+  if (/받는|수취|수령|수신|성함|이름/.test(l)) return 'name';
+  if (/연락|전화|휴대|핸드폰|폰/.test(l)) return 'phone';
+  if (/주소|배송지/.test(l)) return 'address';
+  if (/상품|품목/.test(l)) return 'product';
+  if (/무게|중량/.test(l)) return 'weight';
+  if (/입금|결제/.test(l)) return 'payment';
+  return null;
+}
+const LABEL_RE = /^[\s\-•·*]*(받는\s*(?:분|사람|이)(?:\s*(?:성함|이름))?|수취인|수령인|수신자|성함|이름|연락처|전화번호|전화|휴대폰|핸드폰|주소|배송지|배송\s*주소|상품명|상품|품목|무게|중량|입금\s*(?:여부|상태|확인)?|결제\s*(?:여부|상태)?|보내는\s*(?:분|사람|이)(?:\s*(?:성함|이름))?|보내시는\s*분|보낸\s*(?:분|사람|이)|발송인|메모|비고|요청\s*사항|배송\s*메모|배송\s*요청)\s*[:：=]\s*(.*)$/;
+const MEMO_LABEL = /(?:^|[\s,\/|])(?:메모|비고|요청\s*사항|배송\s*메모|배송\s*요청)\s*[:：]\s*/;
+/** 메모 라벨 이후(다음 라벨 줄 전까지)를 메모로 분리. 메모 안의 번호·상품명이 다른 항목으로 오분류되지 않게 먼저 제거 */
+function extractMemo(raw) {
+  const keep = [], memo = []; let inMemo = false;
+  for (const ln of raw.split('\n')) {
+    if (inMemo) { if (LABEL_RE.test(ln.trim())) inMemo = false; else { memo.push(ln.trim()); continue; } }
+    const m = ln.match(MEMO_LABEL);
+    if (m) {
+      const before = ln.slice(0, m.index).trim(); const after = ln.slice(m.index + m[0].length).trim();
+      if (before) keep.push(before);
+      if (after) memo.push(after);
+      inMemo = true; continue;
+    }
+    keep.push(ln);
+  }
+  return { rest: keep.join('\n'), memo: memo.join('\n').trim() };
+}
+
+function splitBlocks(text) {
+  text = String(text).replace(/\r\n?/g, '\n').trim();
+  if (!text) return [];
+  const sep = /^\s*(?:[-=*_~]{3,}|#{3,})\s*$/m;
+  const parts = sep.test(text) ? text.split(new RegExp(sep.source, 'gm')) : text.split(/\n\s*\n+/);
+  return parts.map((p) => p.trim()).filter(Boolean);
+}
+
+function classifyPay(text) {
+  if (UNPAID_RE.test(text)) return 'unpaid';       // 부정 표현을 먼저 판별
+  if (PAID_RE.test(text) || /^(완료|확인|완납|ok|o)$/i.test(text.trim())) return 'paid';
+  return '';
+}
+
+function productNames(settings) {
+  const names = new Set(DEFAULT_PRODUCTS);
+  (settings?.products || []).forEach((p) => names.add(p.name));
+  return [...names].sort((a, b) => b.length - a.length);
+}
+
+/** 한 건의 텍스트 블록을 분류. 반환: {raw, f, flags, notes, ambiguous} */
+function parseBlock(rawAll, settings, opts = {}) {
+  const { rest: raw, memo } = extractMemo(rawAll);
+  const f = { name: '', phone: '', address: '', product: '', weight: '', payment: '', sender: '', memo };
+  const flags = {};
+  const notes = [];
+  const lines = raw.split('\n').map((s) => s.trim()).filter(Boolean);
+  const labeled = {}; let dupLabel = false; const free = [];
+  for (const ln of lines) {
+    const m = ln.match(LABEL_RE);
+    const key = m ? labelKey(m[1]) : null;
+    if (key) { if (labeled[key] !== undefined) dupLabel = true; labeled[key] = m[2].trim(); } else free.push(ln);
+  }
+  const allPhones = findPhones(raw);
+  const distinct = [...new Set(allPhones.map((p) => p.num))];
+  let ambiguous = '';
+  if (!opts.force) {
+    if (distinct.length > 1) ambiguous = '연락처가 여러 개 있습니다. 주문이 여러 건 합쳐진 것일 수 있습니다.';
+    else if (dupLabel) ambiguous = '같은 항목(예: 받는 분)이 여러 번 나옵니다. 주문이 여러 건 합쳐진 것일 수 있습니다.';
+  }
+  const prods = productNames(settings);
+  const wnames = (settings?.weights || []).map((w) => w.name);
+  const setFlag = (k, level, msg) => { flags[k] = { level, msg }; };
+
+  // 1) 라벨이 붙은 값
+  if (labeled.name) f.name = labeled.name;
+  if (labeled.sender) f.sender = labeled.sender;
+  if (labeled.address) f.address = labeled.address;
+  if (labeled.phone) { const n = normPhone(labeled.phone); if (n) f.phone = n; else { f.phone = labeled.phone; setFlag('phone', 'warn', '연락처 형식이 올바르지 않습니다'); } }
+  if (labeled.weight) { const w = normWeight(labeled.weight); f.weight = w || labeled.weight; }
+  if (labeled.product) {
+    const hit = prods.find((p) => labeled.product.includes(p));
+    f.product = hit || labeled.product.replace(WEIGHT_RE, ' ').replace(BOX_RE, ' ').replace(/\s*짜리/g, '').replace(/\s+/g, ' ').trim();
+    if (!labeled.weight) { const w = normWeight(labeled.product); if (w) f.weight = w; }
+  }
+  if (labeled.payment) { f.payment = classifyPay(labeled.payment); if (!f.payment) setFlag('payment', 'warn', '입금 여부를 판단하지 못했습니다'); }
+
+  // 2) 라벨 없는 나머지(자유 형식) 텍스트에서 부족한 항목 추출
+  let t = ' ' + free.join(' / ') + ' ';
+  const cut = (m) => { t = t.replace(m[0], ' / '); };
+  let m;
+  if ((m = t.match(SENDER_RE))) { if (!f.sender) f.sender = m[1]; cut(m); }
+  t = t.replace(/(?:보내는\s*(?:분|사람|이)|보낸\s*(?:분|사람|이)|발송인)\s*[:：]?/g, ' / '); // 값 없는 보내는 분 문구
+  if ((m = t.match(UNPAID_RE))) { if (!f.payment) f.payment = 'unpaid'; cut(m); }
+  else if ((m = t.match(PAID_RE))) { if (!f.payment) f.payment = 'paid'; cut(m); }
+  const ph = findPhones(t);
+  if (ph.length) { if (!f.phone) f.phone = ph[0].num; t = t.replace(ph[0].raw, ' / '); }
+  // 명시적 표기(상품명:/상품:/품목:)가 일반 추론보다 우선
+  const pm = t.match(/(?:상품명|상품|품목)\s*[:：]\s*/);
+  if (pm) {
+    const after = t.slice(pm.index + pm[0].length);
+    const hit = prods.find((p) => after.startsWith(p));
+    if (hit) { if (!f.product) f.product = hit; t = t.slice(0, pm.index) + ' / ' + after.slice(hit.length); }
+    else {
+      const w = after.match(/^[^\s\/,;|]+/);
+      if (w && !/^\d/.test(w[0])) { if (!f.product) { f.product = w[0]; setFlag('product', 'warn', '등록되지 않은 상품'); } t = t.slice(0, pm.index) + ' / ' + after.slice(w[0].length); }
+      else t = t.slice(0, pm.index) + ' / ' + after;
+    }
+  }
+  if ((m = t.match(WEIGHT_RE))) { if (!f.weight) f.weight = `${parseFloat(m[1])}kg`; cut(m); t = t.replace(/\/\s*짜리/g, ' / '); }
+  t = t.replace(BOX_RE, ' / ');
+  const inText = f.product ? [] : prods.filter((p) => t.includes(p));
+  if (inText.length) {
+    if (!f.product) {
+      f.product = inText.sort((a, b) => t.indexOf(a) - t.indexOf(b))[0];
+      if (new Set(inText).size > 1) setFlag('product', 'warn', `상품이 여러 개 인식됨: ${inText.join(', ')}`);
+    }
+    t = t.split(f.product).join(' / ');
+  }
+  t = t.replace(/(?:받는\s*(?:분|사람)|성함|이름|연락처|주소|배송지|상품명?|무게|입금\s*(?:여부)?|결제)\s*[:：]/g, ' / ');
+
+  // 이름·주소 분리: 전화번호·상품·무게·보내는 분·입금을 뺀 나머지 텍스트에서 주소 → 이름 순으로 추출
+  let tokens = [];
+  t.split(/\s*[\/|,;\t]\s*|\s{2,}/).map((s) => s.trim()).filter(Boolean).forEach((seg, si) => seg.split(/\s+/).forEach((w) => { if (w !== '님') tokens.push({ w, si }); }));
+  const strong = (w) => REGION_RE.test(w) || /특별(?:자치)?(?:시|도)|광역시/.test(w) || (w.length >= 3 && /[가-힣]{2,}(시|군|구)$/.test(w));
+  const addrish = (w) => /\d/.test(w) || ADDR_SUFFIX_RE.test(w) || /^[(\[（].*[)\]）]$/.test(w) || strong(w);
+  let aS = -1, aE = -1;
+  if (!f.address) {
+    aS = tokens.findIndex((k, i) => strong(k.w) && (i + 1 < tokens.length && addrish(tokens[i + 1].w) || /(특별|광역|도$)/.test(k.w) || REGION_RE.test(k.w)));
+    if (aS < 0) aS = tokens.findIndex((k) => /[로길]$/.test(k.w) || (/[가-힣]/.test(k.w) && /\d/.test(k.w) && /(동|호|길|로)/.test(k.w)));
+    if (aS >= 0) {
+      // 같은 구간(구분자 사이)의 단어는 아파트명 등도 전부 주소로 묶고, 다음 구간은 주소처럼 보일 때만 이어 붙임
+      aE = aS;
+      while (aE + 1 < tokens.length && (tokens[aE + 1].si === tokens[aS].si || tokens[aE + 1].si === tokens[aE].si || addrish(tokens[aE + 1].w))) aE++;
+    }
+  }
+  let nameGuessed = false;
+  if (!f.name) {
+    let idx = tokens.findIndex((k, i) => /^[가-힣]{2,4}$/.test(k.w) && !(aS >= 0 && i >= aS && i <= aE));
+    if (idx >= 0) {
+      f.name = tokens[idx].w;
+      tokens.splice(idx, 1);
+      if (aS > idx) { aS--; aE--; }
+    } else if (aS >= 0 && aE > aS && /^[가-힣]{2,4}$/.test(tokens[aE].w) && !addrish(tokens[aE].w)) {
+      // 주소 뒤에 이름이 붙어 있는 경우: 경계가 불분명하므로 사용자 확인을 요청
+      f.name = tokens[aE].w; tokens.splice(aE, 1); aE--; nameGuessed = true;
+    }
+  }
+  if (!f.address && aS >= 0) {
+    f.address = tokens.slice(aS, aE + 1).map((k) => k.w).join(' ');
+    tokens.splice(aS, aE - aS + 1);
+    if (!strong(f.address.split(' ')[0])) setFlag('address', 'warn', '주소가 맞는지 확인해 주세요');
+  }
+  const leftover = tokens.map((k) => k.w).filter((w) => !/^[\/|,;:：\-]+$/.test(w));
+  if (leftover.length) notes.push('분류되지 않은 내용: ' + leftover.join(' '));
+  if ((leftover.length || nameGuessed) && !labeled.name) setFlag('name', 'warn', '이름·주소 경계를 확인해 주세요');
+
+  // 3) 기본값 적용: 상품명 귤, 무게 10kg (사용자가 보고 알 수 있게 표시)
+  const defaults = new Set();
+  if (!f.product) { f.product = DEFAULT_PRODUCT; defaults.add('product'); setFlag('product', 'default', '기본값 적용'); }
+  if (!f.weight) { f.weight = DEFAULT_WEIGHT; defaults.add('weight'); setFlag('weight', 'default', '기본값 적용'); }
+  // 입금 여부: 미납/부정 표현이 없고 판단 불가 항목(라벨은 있으나 해석 실패)도 아니면 '입금 완료'를 기본값으로
+  if (!f.payment && !flags.payment) {
+    f.payment = (settings?.payments || defaultSettings.payments).find((p) => p.active && p.paid)?.id || 'paid';
+    defaults.add('payment'); setFlag('payment', 'default', '기본값 적용');
+  }
+  const pre = (k) => (defaults.has(k) ? '기본값 적용 · ' : '');
+
+  // 4) 설정과 대조 + 필수 항목 검사 (입금 여부·보내는 분은 빈칸 허용)
+  if (f.product && !prods.concat((settings?.products || []).map((p) => p.name)).includes(f.product)) setFlag('product', 'warn', pre('product') + '등록되지 않은 상품');
+  else if (f.product && settings && !settings.products.some((p) => p.active && p.name === f.product)) setFlag('product', 'warn', pre('product') + '설정에 없거나 사용 중지된 상품입니다');
+  if (f.weight && settings && !wnames.includes(f.weight)) {
+    const alt = (settings.weights || []).find((w) => w.active && normKey(w.name) === normKey(f.weight));
+    if (alt) f.weight = alt.name; else setFlag('weight', 'warn', pre('weight') + '설정에 없는 무게입니다 (설정에서 추가하거나 선택하세요)');
+  }
+  for (const [k, label] of [['name','받는 분 성함'],['phone','연락처'],['address','주소']]) {
+    if (!f[k]) setFlag(k, 'missing', `${label} 정보를 찾지 못했습니다`);
+  }  if (memo.length > 500) setFlag('memo', 'warn', '메모가 500자를 넘습니다 (저장 전에 줄여 주세요)');
+  return { raw: rawAll, f, flags, notes, ambiguous };
+}
+
+function parseOrders(text, settings) {
+  return splitBlocks(text).map((b) => parseBlock(b, settings));
+}
+/** 모호한 블록을 줄 단위 / 이름 항목 단위로 나눠 다시 분류 */
+function splitAmbiguous(raw, mode, settings) {
+  const lines = raw.split('\n').map((s) => s.trim()).filter(Boolean);
+  let chunks;
+  if (mode === 'lines') chunks = lines;
+  else {
+    chunks = []; let cur = []; let hasName = false;
+    for (const ln of lines) {
+      const m = ln.match(LABEL_RE);
+      const isName = m && labelKey(m[1]) === 'name';
+      if (isName && hasName) { chunks.push(cur.join('\n')); cur = []; hasName = false; }
+      if (isName) hasName = true;
+      cur.push(ln);
+    }
+    if (cur.length) chunks.push(cur.join('\n'));
+  }
+  return chunks.map((c) => parseBlock(c, settings));
+}
+/*PARSER-END*/
+
+/* ==========================================================================
+   상태 / API
+   ========================================================================== */
+const S = {
+  orders: [], trash: [], settings: null, etag: null, loaded: false,
+  page: 1, pageSize: 20,
+  filt: { q: '', pay: '', prod: '', weight: '', from: '', to: '' },
+};
+
+/** 서버 설정을 아직 못 불러왔거나 null 일 때 쓰는 기본 설정 (자동 분류·미리보기 전용) */
+const defaultSettings = {
+  products: [{ name: '귤', active: true }, { name: '한라봉', active: true }, { name: '레드향', active: true }],
+  weights: [{ name: '5kg', active: true }, { name: '10kg', active: true }],
+  payments: [{ id: 'paid', name: '입금 완료', paid: true, active: true }, { id: 'unpaid', name: '미입금', paid: false, active: true }],
+};
+const cfg = () => {
+  const s = S.settings;
+  return {
+    products: Array.isArray(s?.products) ? s.products : defaultSettings.products,
+    weights: Array.isArray(s?.weights) ? s.weights : defaultSettings.weights,
+    payments: Array.isArray(s?.payments) ? s.payments : defaultSettings.payments,
+  };
+};
+/* ==========================================================================
+   로컬 저장소 (서버 없음): 이 브라우저의 localStorage 에 JSON 으로 저장
+   - gyul_orders: 주문 목록 / gyul_trash: 휴지통 / gyul_settings: 설정
+   ========================================================================== */
+const LOCAL_PASSWORD = ''; // 화면 잠금용 비밀번호. 비워두면(기본) 로그인 화면 없이 바로 열립니다. 예: '1234' (보안 기능이 아니라 단순 잠금입니다)
+const KEY = { orders: 'gyul_orders', trash: 'gyul_trash', settings: 'gyul_settings' };
+const MAX_ORDERS = 20000;
+
+class ApiError extends Error { constructor(msg, status, data) { super(msg); this.status = status; this.data = data || {}; } }
+const bad = (msg) => new ApiError(msg, 400);
+const genId = () => (globalThis.crypto?.randomUUID ? crypto.randomUUID() : 'id' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+
+function defaultSettingsFull() {
+  return {
+    rev: 1,
+    products: ['귤', '한라봉', '레드향'].map((name, i) => ({ id: `p${i + 1}`, name, active: true })),
+    weights: ['5kg', '10kg'].map((name, i) => ({ id: `w${i + 1}`, name, active: true })),
+    payments: [{ id: 'paid', name: '입금 완료', paid: true, active: true }, { id: 'unpaid', name: '미입금', paid: false, active: true }],
+  };
+}
+function lsGet(key) {
+  let raw;
+  try { raw = localStorage.getItem(key); } catch { throw new ApiError('이 브라우저에서는 저장소(localStorage)를 사용할 수 없습니다. 시크릿 모드이거나 사이트 데이터가 차단되어 있을 수 있습니다.', 0); }
+  if (raw == null) return null;
+  try { return JSON.parse(raw); } catch { throw new ApiError(`저장된 데이터(${key})가 손상되어 읽을 수 없습니다. 데이터를 덮어쓰지 않았습니다. 백업 파일이 있으면 복원해 주세요.`, 0); }
+}
+/** 여러 키를 한꺼번에 저장. 실패하면 이전 값으로 되돌림 */
+function lsSet(pairs) {
+  const prev = {};
+  try {
+    for (const k of Object.keys(pairs)) prev[k] = localStorage.getItem(k);
+    for (const [k, v] of Object.entries(pairs)) localStorage.setItem(k, JSON.stringify(v));
+  } catch {
+    for (const [k, v] of Object.entries(prev)) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} }
+    throw new ApiError('브라우저 저장소에 저장하지 못했습니다. 저장 공간이 부족하거나 차단되어 있을 수 있습니다. 입력한 내용은 그대로 남아 있습니다.', 0);
+  }
+}
+function readAll() {
+  const orders = lsGet(KEY.orders), trash = lsGet(KEY.trash); let settings = lsGet(KEY.settings);
+  if ((orders && !Array.isArray(orders)) || (trash && !Array.isArray(trash))) throw new ApiError('저장된 주문 데이터 형식이 올바르지 않습니다. 데이터를 덮어쓰지 않았습니다.', 0);
+  if (!settings || !Array.isArray(settings.products) || !Array.isArray(settings.weights) || !Array.isArray(settings.payments)) {
+    if (settings) throw new ApiError('저장된 설정 데이터 형식이 올바르지 않습니다. 데이터를 덮어쓰지 않았습니다.', 0);
+    settings = defaultSettingsFull(); lsSet({ [KEY.settings]: settings }); // 최초 실행: 기본 설정 생성
+  }
+  return { orders: orders || [], trash: trash || [], settings };
+}
+
+const lstr = (v, max, label, required = false) => {
+  const s = String(v ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (required && !s) throw bad(`${label}을(를) 입력해 주세요.`);
+  if (s.length > max) throw bad(`${label}은(는) ${max}자 이하로 입력해 주세요.`);
+  return s;
+};
+function cleanFieldsLocal(raw, settings, existing) {
+  const name = lstr(raw?.name, 40, '받는 분 성함', true);
+  const phone = normPhone(raw?.phone);
+  if (!phone) throw bad('연락처 형식이 올바르지 않습니다. (예: 010-1234-5678)');
+  const address = lstr(raw?.address, 200, '주소', true);
+  const product = lstr(raw?.product, 30, '상품명', true), weight = lstr(raw?.weight, 30, '상품 무게', true);
+  const payment = lstr(raw?.payment, 30, '입금 여부'), sender = lstr(raw?.sender, 40, '보내는 분');
+  const memo = String(raw?.memo ?? '').replace(/\r\n?/g, '\n').replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, ' ').split('\n').map((s) => s.replace(/[ \t]+/g, ' ').trim()).join('\n').trim();
+  if (memo.length > 500) throw bad('메모는 500자 이하로 입력해 주세요.');
+  if (!settings.products.some((p) => p.active && p.name === product) && existing?.product !== product) throw bad(`상품 '${product}'은(는) 설정에 등록된 사용 가능한 상품이 아닙니다.`);
+  if (!settings.weights.some((w) => w.active && w.name === weight) && existing?.weight !== weight) throw bad(`무게 '${weight}'은(는) 설정에 등록된 사용 가능한 무게가 아닙니다.`);
+  if (payment && !settings.payments.some((p) => p.active && p.id === payment) && existing?.payment !== payment) throw bad('입금 여부 값이 올바르지 않습니다.');
+  return { name, phone, address, product, weight, payment, sender, memo };
+}
+function cleanSettingsLocal(input, cur, allOrders) {
+  if (!input || typeof input !== 'object') throw bad('설정 값이 올바르지 않습니다.');
+  const build = (key, kind) => {
+    const list = input[key];
+    if (!Array.isArray(list) || list.length > 50) throw bad(`${kind} 목록이 올바르지 않습니다.`);
+    const seen = new Set();
+    const out = list.map((it) => {
+      const name = lstr(it?.name, 30, `${kind} 이름`, true);
+      const k = name.replace(/\s/g, '').toLowerCase();
+      if (seen.has(k)) throw bad(`${kind} '${name}'이(가) 중복되었습니다.`);
+      seen.add(k);
+      const known = cur[key].find((c) => c.id === it?.id);
+      const item = { id: known ? known.id : 'x' + genId().replace(/-/g, '').slice(0, 10), name, active: it?.active !== false };
+      if (key === 'payments') item.paid = !!it?.paid;
+      return item;
+    });
+    if (!out.some((x) => x.active)) throw bad(`${kind}은(는) 최소 1개 이상 사용 상태여야 합니다.`);
+    for (const c of cur[key]) {
+      if (out.some((x) => x.id === c.id)) continue;
+      const used = key === 'payments' ? allOrders.some((o) => o.payment === c.id) : allOrders.some((o) => o[key === 'products' ? 'product' : 'weight'] === c.name);
+      if (used || (key === 'payments' && (c.id === 'paid' || c.id === 'unpaid'))) throw bad(`${kind} '${c.name}'은(는) 사용 중이거나 기본 항목이라 삭제할 수 없습니다. 비활성화해 주세요.`);
+    }
+    return out;
+  };
+  const products = build('products', '상품'), weights = build('weights', '무게'), payments = build('payments', '입금 상태');
+  if (!payments.some((p) => p.active && p.paid) || !payments.some((p) => p.active && !p.paid)) throw bad('입금 상태에는 "입금완료로 집계" 항목과 "미입금" 항목이 각각 1개 이상 사용 상태여야 합니다.');
+  return { rev: (cur.rev || 1) + 1, products, weights, payments };
+}
+const conflictErr = (current) => new ApiError('다른 탭(또는 사용자)이 먼저 이 항목을 수정했습니다.', 409, { code: 'conflict', current });
+
+/** 변경 적용 (최신 localStorage 데이터 기준) */
+function applyLocal(d, body) {
+  const now = new Date().toISOString();
+  switch (body.op) {
+    case 'addOrders': {
+      const list = body.orders;
+      if (!Array.isArray(list) || !list.length || list.length > 200) throw bad('한 번에 1~200건까지 저장할 수 있습니다.');
+      if (d.orders.length + d.trash.length + list.length > MAX_ORDERS) throw bad('저장 가능한 주문 수를 초과했습니다.');
+      const cleaned = list.map((o) => cleanFieldsLocal(o, d.settings, null));
+      let no = Math.max(0, ...d.orders.map((o) => o.no || 0), ...d.trash.map((o) => o.no || 0));
+      for (const f of cleaned) d.orders.push({ id: genId(), no: ++no, ...f, createdAt: now, updatedAt: now, rev: 1 });
+      return;
+    }
+    case 'updateOrder': {
+      const o = d.orders.find((x) => x.id === body.id);
+      if (!o) throw new ApiError('주문을 찾을 수 없습니다. 다른 탭에서 삭제했을 수 있습니다.', 404, { code: 'missing' });
+      if (body.baseRev !== o.rev && !body.force) throw conflictErr(o);
+      Object.assign(o, cleanFieldsLocal(body.fields, d.settings, o), { updatedAt: now, rev: o.rev + 1 });
+      return;
+    }
+    case 'deleteOrder': {
+      const i = d.orders.findIndex((x) => x.id === body.id);
+      if (i < 0) throw new ApiError('주문을 찾을 수 없습니다. 이미 삭제되었을 수 있습니다.', 404, { code: 'missing' });
+      const [o] = d.orders.splice(i, 1);
+      d.trash.push({ ...o, deletedAt: now, updatedAt: now, rev: o.rev + 1 });
+      return;
+    }
+    case 'restoreOrder': {
+      const i = d.trash.findIndex((x) => x.id === body.id);
+      if (i < 0) throw new ApiError('복구할 주문을 찾을 수 없습니다.', 404, { code: 'missing' });
+      const [o] = d.trash.splice(i, 1);
+      delete o.deletedAt; o.updatedAt = now; o.rev += 1;
+      d.orders.push(o);
+      return;
+    }
+    case 'purgeOrder': {
+      const i = d.trash.findIndex((x) => x.id === body.id);
+      if (i < 0) throw new ApiError('휴지통에서 주문을 찾을 수 없습니다.', 404, { code: 'missing' });
+      d.trash.splice(i, 1);
+      return;
+    }
+    case 'saveSettings': {
+      if (body.baseRev !== d.settings.rev && !body.force) throw conflictErr(d.settings);
+      d.settings = cleanSettingsLocal(body.settings, d.settings, [...d.orders, ...d.trash]);
+      return;
+    }
+    default: throw bad('알 수 없는 요청입니다.');
+  }
+}
+
+function applyView(v) {
+  S.orders = v.orders; S.trash = v.trash; S.settings = v.settings; S.loaded = true;
+  renderAll();
+}
+/** 조회/새로고침: localStorage 에서 읽어 화면 갱신 */
+async function load({ silent = false } = {}) {
+  try { applyView(readAll()); }
+  catch (e) {
+    if (!silent) { $('listArea').innerHTML = `<div class="empty">⚠ 불러오기 실패: ${esc(e.message)}<br><br><button class="btn" onclick="load()">다시 시도</button></div>`; }
+    else console.warn(e);
+  }
+}
+/** 변경: 최신 데이터를 읽고 → 적용 → 전부 성공했을 때만 저장 → 화면 갱신 */
+async function mutate(body) {
+  const d = readAll();
+  applyLocal(d, body);
+  lsSet({ [KEY.orders]: d.orders, [KEY.trash]: d.trash, [KEY.settings]: d.settings });
+  applyView(d);
+  return { ok: true };
+}
+// 다른 탭에서 데이터가 바뀌면 자동 반영
+window.addEventListener('storage', (e) => {
+  if (e.key && e.key.startsWith('gyul_') && S.loaded) { load({ silent: true }); toast('다른 탭의 변경 사항이 반영되었습니다.'); }
+});
+function toast(msg, kind = '', action) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + kind;
+  el.innerHTML = `<span>${esc(msg)}</span>`;
+  if (action) { const b = document.createElement('button'); b.textContent = action.label; b.onclick = () => { el.remove(); action.fn(); }; el.appendChild(b); }
+  $('toasts').appendChild(el);
+  setTimeout(() => el.remove(), action ? 9000 : 4000);
+}
+
+/* ==========================================================================
+   로그인
+   ========================================================================== */
+function showLogin() { $('login').style.display = 'flex'; setTimeout(() => $('loginPw').focus(), 50); }
+const authed = () => !LOCAL_PASSWORD || sessionStorage.getItem('gyul_auth') === '1';
+$('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('loginErr').hidden = true;
+  if ($('loginPw').value !== LOCAL_PASSWORD) { $('loginErr').textContent = '비밀번호가 올바르지 않습니다.'; $('loginErr').hidden = false; return; }
+  try { sessionStorage.setItem('gyul_auth', '1'); } catch {}
+  $('loginPw').value = ''; $('login').style.display = 'none';
+  await load();
+});
+$('btnLogout').onclick = () => { try { sessionStorage.removeItem('gyul_auth'); } catch {} S.loaded = false; S.orders = []; S.trash = []; renderAll(); $('listArea').innerHTML = ''; showLogin(); };
+if (!LOCAL_PASSWORD) $('btnLogout').hidden = true;
+/* ==========================================================================
+   목록 / 필터 / 페이지네이션
+   ========================================================================== */
+const payOf = (id) => (cfg().payments || []).find((p) => p.id === id);
+const isPaid = (o) => !!payOf(o.payment)?.paid;
+const dateOf = (iso) => kstDate.format(new Date(iso));
+
+function filtered() {
+  const { q, pay, prod, weight, from, to } = S.filt;
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const digitsQ = q.replace(/\D/g, '');
+  return S.orders.filter((o) => {
+    if (pay && (pay === '-' ? o.payment : o.payment !== pay)) return false;
+    if (prod && o.product !== prod) return false;
+    if (weight && o.weight !== weight) return false;
+    const d = dateOf(o.createdAt);
+    if (from && d < from) return false;
+    if (to && d > to) return false;
+    if (words.length) {
+      const hay = `${o.name} ${o.phone} ${o.address} ${o.product} ${o.sender || ''} ${o.memo || ''}`.toLowerCase();
+      const hayDigits = o.phone.replace(/\D/g, '');
+      return words.every((w) => hay.includes(w) || (/^\d+$/.test(w) && hayDigits.includes(w)));
+    }
+    return true;
+  }).sort((a, b) => b.no - a.no);
+}
+
+function fillSelect(sel, first, items, keep) {
+  const cur = keep ?? sel.value;
+  sel.innerHTML = `<option value="">${esc(first)}</option>` + items.map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join('');
+  sel.value = items.some(([v]) => v === cur) ? cur : '';
+}
+function renderFilters() {
+  fillSelect($('fPay'), '전체', [...cfg().payments.map((p) => [p.id, p.name]), ['-', '미지정(빈칸)']], S.filt.pay);
+  const uniq = (key, setList) => [...new Set([...setList.map((x) => x.name), ...S.orders.map((o) => o[key])])].map((v) => [v, v]);
+  fillSelect($('fProd'), '전체', uniq('product', cfg().products), S.filt.prod);
+  fillSelect($('fWeight'), '전체', uniq('weight', cfg().weights), S.filt.weight);
+}
+
+function renderAll() {
+  if (!S.loaded) { $('stTotal').textContent = $('stPaid').textContent = $('stUnpaid').textContent = '-'; return; }
+  const paid = S.orders.filter(isPaid).length;
+  $('stTotal').textContent = S.orders.length;
+  $('stPaid').textContent = paid;
+  $('stUnpaid').textContent = S.orders.length - paid;
+  $('trashCnt').textContent = S.trash.length ? `(${S.trash.length})` : '';
+  renderFilters();
+  renderList();
+}
+
+function renderList() {
+  const list = filtered();
+  const total = list.length;
+  const pages = Math.max(1, Math.ceil(total / S.pageSize));
+  if (S.page > pages) S.page = pages;
+  const start = (S.page - 1) * S.pageSize;
+  const rows = list.slice(start, start + S.pageSize);
+  const active = Object.values(S.filt).some(Boolean);
+  $('countLine').innerHTML = `전체 <b>${S.orders.length}</b>건 중 ${active ? '검색·필터 결과 ' : ''}<b>${total}</b>건 · 현재 표시 중 <b>${total ? `${start + 1}–${start + rows.length}` : 0}</b>번째 (<b>${rows.length}</b>건)`;
+  if (!rows.length) {
+    $('listArea').innerHTML = `<div class="tablebox"><div class="empty">${S.orders.length ? '조건에 맞는 주문이 없습니다.' : '아직 등록된 주문이 없습니다. “주문 추가” 또는 “텍스트 일괄 입력”으로 시작해 보세요.'}</div></div>`;
+  } else {
+    $('listArea').innerHTML = `<div class="tablebox"><table><thead><tr>
+      <th>번호</th><th>받는 분</th><th>연락처</th><th>주소</th><th>상품명</th><th>무게</th><th>입금 여부</th><th>보내는 분</th><th>메모</th><th>등록일</th><th>수정</th><th>삭제</th></tr></thead><tbody>
+      ${rows.map((o) => { const p = payOf(o.payment); return `<tr>
+        <td data-l="번호">${o.no}</td>
+        <td data-l="받는 분">${esc(o.name)}</td>
+        <td data-l="연락처"><span>${esc(o.phone)}</span></td>
+        <td data-l="주소" class="addr"><span class="clip" title="클릭하면 전체 주소를 펼치거나 접습니다">${esc(o.address)}</span></td>
+        <td data-l="상품명">${esc(o.product)}</td>
+        <td data-l="무게">${esc(o.weight)}</td>
+        <td data-l="입금 여부">${o.payment ? `<span class="badge ${p?.paid ? 'paid' : 'unpaid'}">${esc(p?.name || o.payment)}</span>` : '<span class="badge none">미지정</span>'}</td>
+        <td data-l="보내는 분">${esc(o.sender || '')}</td>
+        <td data-l="메모" class="addr"><span class="clip" title="클릭하면 전체 메모를 펼치거나 접습니다">${esc(o.memo || '')}</span></td>
+        <td data-l="등록일">${esc(dateOf(o.createdAt))}</td>
+        <td data-l="수정"><button class="btn sm" data-edit="${esc(o.id)}">수정</button></td>
+        <td data-l="삭제"><button class="btn sm danger" data-del="${esc(o.id)}">삭제</button></td></tr>`; }).join('')}
+      </tbody></table></div>`;
+  }
+  $('pager').innerHTML = `<button class="btn sm" id="pPrev" ${S.page <= 1 ? 'disabled' : ''}>◀ 이전</button>
+    <span>${S.page} / ${pages} 페이지</span>
+    <button class="btn sm" id="pNext" ${S.page >= pages ? 'disabled' : ''}>다음 ▶</button>
+    <select id="pSize" aria-label="페이지당 건수">${[10, 20, 50, 100].map((n) => `<option value="${n}" ${n === S.pageSize ? 'selected' : ''}>${n}건씩</option>`).join('')}</select>`;
+  $('pPrev').onclick = () => { S.page--; renderList(); window.scrollTo({ top: 0 }); };
+  $('pNext').onclick = () => { S.page++; renderList(); window.scrollTo({ top: 0 }); };
+  $('pSize').onchange = (e) => { S.pageSize = +e.target.value; S.page = 1; renderList(); };
+}
+
+$('listArea').addEventListener('click', (e) => {
+  const t = e.target;
+  if (t.classList.contains('clip')) t.classList.toggle('open');
+  if (t.dataset.edit) openOrder(t.dataset.edit);
+  if (t.dataset.del) askDelete(t.dataset.del);
+});
+let qTimer;
+$('q').addEventListener('input', (e) => { clearTimeout(qTimer); qTimer = setTimeout(() => { S.filt.q = e.target.value; S.page = 1; renderList(); }, 150); });
+for (const [id, key] of [['fPay', 'pay'], ['fProd', 'prod'], ['fWeight', 'weight'], ['fFrom', 'from'], ['fTo', 'to']]) {
+  $(id).addEventListener('change', (e) => { S.filt[key] = e.target.value; S.page = 1; renderList(); });
+}
+$('btnReset').onclick = () => {
+  S.filt = { q: '', pay: '', prod: '', weight: '', from: '', to: '' }; S.page = 1;
+  $('q').value = ''; $('fFrom').value = ''; $('fTo').value = ''; renderAll();
+};
+$('btnRefresh').onclick = async () => { await load(); toast('최신 데이터를 불러왔습니다.', 'ok'); };
+
+/* ==========================================================================
+   대화상자 공통
+   ========================================================================== */
+document.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) e.target.closest('dialog').close(); });
+function confirmBox(title, html, yesLabel = '확인') {
+  return new Promise((resolve) => {
+    $('confTitle').textContent = title; $('confBody').innerHTML = html; $('confYes').textContent = yesLabel;
+    const d = $('confDlg'); let ans = false;
+    $('confYes').onclick = () => { ans = true; d.close(); };
+    $('confNo').onclick = () => d.close();
+    d.onclose = () => resolve(ans);
+    d.showModal();
+  });
+}
+function showErr(id, msg) { const el = $(id); el.textContent = msg; el.hidden = !msg; }
+
+/* ==========================================================================
+   주문 추가 / 수정
+   ========================================================================== */
+let editing = null; // {id, rev}
+function optionsFor(sel, items, current, valueKey = 'name') {
+  const list = items.filter((i) => i.active);
+  if (current && !list.some((i) => i[valueKey] === current)) {
+    const old = items.find((i) => i[valueKey] === current);
+    list.push(old || { [valueKey]: current, name: current });
+  }
+  sel.innerHTML = (valueKey === 'id' ? '<option value="">(미지정)</option>' : '') + list.map((i) => `<option value="${esc(i[valueKey])}">${esc(i.name)}${i.active === false ? ' (사용 중지)' : ''}</option>`).join('');
+  if (current) sel.value = current;
+}
+function openOrder(id) {
+  const o = id ? S.orders.find((x) => x.id === id) : null;
+  if (id && !o) { toast('주문을 찾을 수 없습니다. 목록을 새로고침해 주세요.', 'bad'); return; }
+  editing = o ? { id: o.id, rev: o.rev } : null;
+  $('orderTitle').textContent = o ? `주문 수정 (번호 ${o.no})` : '주문 추가';
+  optionsFor($('oProd'), cfg().products, o?.product);
+  optionsFor($('oWeight'), cfg().weights, o?.weight);
+  optionsFor($('oPay'), cfg().payments, o?.payment, 'id');
+  $('oName').value = o?.name || ''; $('oPhone').value = o?.phone || ''; $('oAddr').value = o?.address || ''; $('oSender').value = o?.sender || ''; $('oMemo').value = o?.memo || ''; memoCnt();
+  if (!o) $('oPay').value = cfg().payments.find((p) => p.active && p.paid)?.id || $('oPay').value;
+  showErr('orderErr', ''); $('orderConflict').hidden = true;
+  $('orderDlg').showModal(); $('oName').focus();
+}
+$('btnAdd').onclick = () => openOrder(null);
+$('oPhone').addEventListener('input', (e) => { e.target.value = livePhone(e.target.value); });
+function memoCnt() { $('oMemoCnt').textContent = $('oMemo').value.length + '/500'; }
+$('oMemo').addEventListener('input', memoCnt);
+function readOrderForm() {
+  return { name: $('oName').value.trim(), phone: $('oPhone').value.trim(), address: $('oAddr').value.trim(), product: $('oProd').value, weight: $('oWeight').value, payment: $('oPay').value, sender: $('oSender').value.trim(), memo: $('oMemo').value };
+}
+async function saveOrder(force) {
+  const f = readOrderForm();
+  if (!f.name) return showErr('orderErr', '받는 분 성함을 입력해 주세요.');
+  if (!normPhone(f.phone)) return showErr('orderErr', '연락처 형식이 올바르지 않습니다. (예: 010-1234-5678)');
+  if (!f.address) return showErr('orderErr', '주소를 입력해 주세요.');
+  if (!f.product || !f.weight) return showErr('orderErr', '상품명과 무게를 선택해 주세요.');
+  showErr('orderErr', ''); $('orderConflict').hidden = true; $('orderSave').disabled = true;
+  try {
+    if (editing) await mutate({ op: 'updateOrder', id: editing.id, baseRev: editing.rev, fields: f, force: !!force });
+    else await mutate({ op: 'addOrders', orders: [f] });
+    $('orderDlg').close();
+    toast(editing ? '주문을 수정했습니다.' : '주문을 저장했습니다.', 'ok');
+  } catch (e) {
+    if (e.status === 409 && e.data.code === 'conflict') {
+      $('conflictMsg').textContent = '⚠ 다른 사용자가 이 주문을 먼저 수정했습니다. 아래에서 선택해 주세요. (입력하신 내용은 그대로 유지됩니다)';
+      $('orderConflict').hidden = false;
+      $('orderConflict').dataset.cur = JSON.stringify(e.data.current);
+    } else showErr('orderErr', e.message);
+  }
+  $('orderSave').disabled = false;
+}
+$('orderForm').addEventListener('submit', (e) => { e.preventDefault(); saveOrder(false); });
+$('btnForce').onclick = async () => {
+  const cur = JSON.parse($('orderConflict').dataset.cur || '{}');
+  editing.rev = cur.rev; await saveOrder(true);
+};
+$('btnLoadTheirs').onclick = () => {
+  const cur = JSON.parse($('orderConflict').dataset.cur || '{}');
+  editing.rev = cur.rev;
+  optionsFor($('oProd'), cfg().products, cur.product); optionsFor($('oWeight'), cfg().weights, cur.weight); optionsFor($('oPay'), cfg().payments, cur.payment, 'id');
+  $('oName').value = cur.name; $('oPhone').value = cur.phone; $('oAddr').value = cur.address; $('oSender').value = cur.sender || ''; $('oMemo').value = cur.memo || ''; memoCnt();
+  $('orderConflict').hidden = true;
+};
+
+/* ==========================================================================
+   삭제 / 휴지통
+   ========================================================================== */
+async function askDelete(id) {
+  const o = S.orders.find((x) => x.id === id); if (!o) return;
+  const ok = await confirmBox('주문 삭제', `<p><b>${esc(o.name)}</b> (${esc(o.phone)}) 님의 주문(번호 ${o.no})을 삭제할까요?</p><p class="hint">삭제하면 휴지통으로 이동하며, 휴지통에서 복구할 수 있습니다.</p>`, '삭제');
+  if (!ok) return;
+  try {
+    await mutate({ op: 'deleteOrder', id });
+    toast('주문을 삭제했습니다. (휴지통으로 이동)', 'ok', { label: '실행 취소', fn: () => restore(id) });
+  } catch (e) { toast('삭제 실패: ' + e.message, 'bad'); }
+}
+async function restore(id) {
+  try { await mutate({ op: 'restoreOrder', id }); toast('주문을 복구했습니다.', 'ok'); renderTrash(); } catch (e) { toast('복구 실패: ' + e.message, 'bad'); }
+}
+function renderTrash() {
+  const t = [...S.trash].sort((a, b) => b.no - a.no);
+  $('trashBody').innerHTML = t.length ? `<table><thead><tr><th>번호</th><th>받는 분</th><th>연락처</th><th>주소</th><th>상품</th><th>무게</th><th>메모</th><th>삭제일</th><th>복구</th><th>영구 삭제</th></tr></thead><tbody>${t.map((o) => `<tr>
+    <td data-l="번호">${o.no}</td><td data-l="받는 분">${esc(o.name)}</td><td data-l="연락처">${esc(o.phone)}</td><td data-l="주소" class="addr"><span class="clip">${esc(o.address)}</span></td>
+    <td data-l="상품">${esc(o.product)}</td><td data-l="무게">${esc(o.weight)}</td><td data-l="메모" class="addr"><span class="clip">${esc(o.memo || '')}</span></td><td data-l="삭제일">${esc(dateOf(o.deletedAt))}</td>
+    <td data-l="복구"><button class="btn sm" data-restore="${esc(o.id)}">복구</button></td>
+    <td data-l="영구 삭제"><button class="btn sm danger" data-purge="${esc(o.id)}">영구 삭제</button></td></tr>`).join('')}</tbody></table>` : '<div class="empty">휴지통이 비어 있습니다.</div>';
+}
+$('btnTrash').onclick = () => { renderTrash(); $('trashDlg').showModal(); };
+$('trashBody').addEventListener('click', async (e) => {
+  const t = e.target;
+  if (t.classList.contains('clip')) t.classList.toggle('open');
+  if (t.dataset.restore) restore(t.dataset.restore);
+  if (t.dataset.purge) {
+    const o = S.trash.find((x) => x.id === t.dataset.purge);
+    if (!await confirmBox('영구 삭제', `<p><b>${esc(o?.name)}</b> 님의 주문을 <b>완전히 삭제</b>합니다. 이 작업은 되돌릴 수 없습니다.</p>`, '영구 삭제')) return;
+    try { await mutate({ op: 'purgeOrder', id: t.dataset.purge }); toast('영구 삭제했습니다.', 'ok'); renderTrash(); } catch (er) { toast('삭제 실패: ' + er.message, 'bad'); }
+  }
+});
+
+/* ==========================================================================
+   텍스트 일괄 입력 (분류 → 미리보기/수정 → 저장)
+   ========================================================================== */
+let items = []; // {raw, f, flags, notes, ambiguous, id}
+let itemSeq = 0;
+const SAMPLE = `받는 분: 김민수
+연락처: 010-1234-5678
+주소: 제주특별자치도 제주시 예시로 123
+상품: 귤
+무게: 5kg
+입금: 완료
+보내는 분: 이영희
+
+박지영 / 01098765432 / 서귀포시 예시로 25 / 한라봉 10키로 / 미입금
+
+김민수 010-1234-5678 제주특별자치도 제주시 예시로 123 귤 5kg 입금완료 보내는사람 이영희`;
+$('btnBulk').onclick = () => { showErr('bulkErr', ''); $('bulkDlg').showModal(); $('bulkText').focus(); };
+$('btnSample').onclick = () => { $('bulkText').value = SAMPLE; };
+$('btnBulkClear').onclick = () => { $('bulkText').value = ''; items = []; renderItems(); };
+$('btnParse').onclick = () => {
+  const text = $('bulkText').value;
+  if (!text.trim()) return showErr('bulkErr', '분류할 텍스트를 입력해 주세요.');
+  showErr('bulkErr', '');
+  try {
+    items = parseOrders(text, cfg()).map((x) => ({ ...x, id: ++itemSeq }));
+    renderItems();
+  } catch (err) {
+    console.error(err);
+    showErr('bulkErr', '자동 분류 중 오류가 발생했습니다: ' + err.message + '\n입력한 텍스트는 그대로 남아 있습니다.');
+  }
+};
+function itemCell(it, key, label, cls2 = '') {
+  const fl = it.flags[key]; const cls = fl ? fl.level : '';
+  let ctl;
+  if (key === 'product' || key === 'weight') {
+    const src = key === 'product' ? cfg().products : cfg().weights;
+    const opts = src.filter((x) => x.active).map((x) => x.name);
+    const cur = it.f[key];
+    ctl = `<select data-k="${key}"><option value="">선택…</option>${opts.map((n) => `<option ${n === cur ? 'selected' : ''}>${esc(n)}</option>`).join('')}${cur && !opts.includes(cur) ? `<option selected value="${esc(cur)}">${esc(cur)} (미등록)</option>` : ''}</select>`;
+  } else if (key === 'payment') {
+    ctl = `<select data-k="payment"><option value="">(빈칸)</option>${cfg().payments.filter((p) => p.active).map((p) => `<option value="${esc(p.id)}" ${p.id === it.f.payment ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select>`;
+  } else if (key === 'memo') {
+    ctl = `<textarea data-k="memo" rows="2" maxlength="600" aria-label="${label}">${esc(it.f.memo || '')}</textarea>`;
+  } else ctl = `<input type="text" data-k="${key}" value="${esc(it.f[key])}" aria-label="${label}">`;
+  const icon = fl ? (fl.level === 'missing' ? '❗' : fl.level === 'default' ? '' : '⚠') : '';
+  return `<td data-l="${label}" class="${cls2}"><div class="fld ${cls}">${ctl}${fl ? `<span class="msg">${icon} ${esc(fl.msg)}</span>` : ''}</div></td>`;
+}
+function dupNote(it) {
+  const ph = normPhone(it.f.phone); if (!ph) return '';
+  const n = (S.orders || []).filter((o) => o.phone === ph && o.product === it.f.product && o.weight === it.f.weight).length;
+  return n ? `<div class="note">이미 같은 연락처·상품·무게의 주문이 ${n}건 있습니다. (자동으로 합치거나 삭제하지 않습니다. 중복이면 이 항목을 제외하세요.)</div>` : '';
+}
+function renderItems() {
+  const box = $('bulkPreview');
+  if (!items.length) { box.innerHTML = ''; $('btnBulkSave').disabled = true; $('bulkSummary').textContent = ''; return; }
+  const rows = items.map((it, i) => it.ambiguous ? `
+    <tr data-id="${it.id}"><td colspan="9" class="sub"><div class="card" style="margin:0">
+      <div class="head"><b>#${i + 1} 구분 확인 필요</b><button class="btn sm danger" data-act="remove">제외</button></div>
+      <div class="note">${esc(it.ambiguous)} 임의로 나누지 않았습니다. 어떻게 처리할지 선택해 주세요.</div>
+      <pre>${esc(it.raw)}</pre>
+      <p style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0">
+        <button class="btn sm" data-act="lines">줄마다 1건으로 나누기</button>
+        <button class="btn sm" data-act="labels">‘받는 분’ 항목마다 새 주문으로 나누기</button>
+        <button class="btn sm" data-act="force">나누지 않고 1건으로 처리</button>
+      </p></div></td></tr>` : `
+    <tr data-id="${it.id}">
+      ${itemCell(it, 'name', '받는 분 성함')}${itemCell(it, 'phone', '연락처')}${itemCell(it, 'address', '주소', 'wide')}
+      ${itemCell(it, 'product', '상품명')}${itemCell(it, 'weight', '무게')}${itemCell(it, 'payment', '입금 여부')}${itemCell(it, 'sender', '보내는 분')}${itemCell(it, 'memo', '메모', 'memo')}
+      <td data-l="#${i + 1}"><button class="btn sm danger" data-act="remove">제외</button></td></tr>
+    <tr data-sub="${it.id}"><td colspan="9" class="sub">${it.notes.map((n) => `<div class="note">${esc(n)}</div>`).join('')}${dupNote(it)}<details><summary class="hint">#${i + 1} 원본 텍스트 보기</summary><pre style="margin:4px 0;white-space:pre-wrap;word-break:break-all;font-size:13px">${esc(it.raw)}</pre></details></td></tr>`).join('');
+  box.innerHTML = `<h3>분류 결과 (${items.length}건) — 저장 전에 확인·수정하세요</h3>
+    <p class="hint">빨강 = 필수 정보 누락, 노랑 = 불확실, 파랑 = <b>기본값 적용</b>(상품명 귤 / 무게 10kg). 입금 여부는 미납 표현이 없으면 <b>입금 완료</b>가 기본값이며(바꿀 수 있음), 보내는 분은 입력된 내용이 없으면 빈칸으로 둡니다.</p>
+    <div class="tablebox" style="overflow:auto"><table class="ptable"><thead><tr><th>받는 분 성함</th><th>연락처</th><th>주소</th><th>상품명</th><th>무게</th><th>입금 여부</th><th>보내는 분</th><th>메모</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  updateBulkState();
+}function itemProblems(it) {
+  if (it.ambiguous) return ['구분 확인 필요'];
+  const p = []; const f = it.f;
+  if (!f.name.trim()) p.push('이름'); if (!normPhone(f.phone)) p.push('연락처'); if (!f.address.trim()) p.push('주소');
+  if (!cfg().products.some((x) => x.active && x.name === f.product)) p.push('상품');
+  if (!cfg().weights.some((x) => x.active && x.name === f.weight)) p.push('무게');
+  if ((f.memo || '').length > 500) p.push('메모');
+  if (f.payment && !cfg().payments.some((x) => x.active && x.id === f.payment)) p.push('입금 여부');
+  return p;
+}
+function updateBulkState() {
+  const bad = items.filter((it) => itemProblems(it).length).length;
+  $('btnBulkSave').disabled = !items.length || bad > 0;
+  $('bulkSummary').textContent = items.length ? (bad ? `⚠ 확인이 필요한 항목 ${bad}건 — 해결해야 저장할 수 있습니다` : `${items.length}건 저장 준비 완료`) : '';
+}
+$('bulkPreview').addEventListener('input', (e) => {
+  const k = e.target.dataset.k; if (!k) return;
+  const it = items.find((x) => x.id === +e.target.closest('tr').dataset.id);
+  it.f[k] = e.target.value;
+  if (k === 'phone') { e.target.value = it.f.phone = livePhone(e.target.value); }
+  if (it.flags[k]) { delete it.flags[k]; const lab = e.target.closest('.fld'); lab.classList.remove('missing', 'warn', 'default'); lab.querySelector('.msg')?.remove(); }
+  updateBulkState();
+});
+$('bulkPreview').addEventListener('click', (e) => {
+  const act = e.target.dataset.act; if (!act) return;
+  const idx = items.findIndex((x) => x.id === +e.target.closest('tr').dataset.id); const it = items[idx];
+  if (act === 'remove') items.splice(idx, 1);
+  else if (act === 'force') items[idx] = { ...parseBlock(it.raw, cfg(), { force: true }), id: ++itemSeq };
+  else items.splice(idx, 1, ...splitAmbiguous(it.raw, act, cfg()).map((x) => ({ ...x, id: ++itemSeq })));
+  renderItems();
+});
+$('btnBulkSave').onclick = async () => {
+  if (!items.length || items.some((it) => itemProblems(it).length)) return;
+  $('btnBulkSave').disabled = true; showErr('bulkErr', '');
+  try {
+    const n = items.length;
+    await mutate({ op: 'addOrders', orders: items.map((it) => ({ ...it.f, phone: normPhone(it.f.phone) })) });
+    items = []; renderItems(); $('bulkText').value = ''; $('bulkDlg').close();
+    toast(`${n}건의 주문을 저장했습니다.`, 'ok');
+  } catch (e) { showErr('bulkErr', '저장하지 못했습니다: ' + e.message + '\n입력하신 내용은 그대로 남아 있습니다.'); updateBulkState(); }
+};
+
+/* ==========================================================================
+   설정
+   ========================================================================== */
+let setDraft = null;
+const usedCount = (key, it) => [...S.orders, ...S.trash].filter((o) => (key === 'payments' ? o.payment === it.id : o[key === 'products' ? 'product' : 'weight'] === it.name)).length;
+function renderSettings() {
+  const sec = (key, title, hint) => `<h3>${title}</h3><p class="hint">${hint}</p><div class="rowlist" data-sec="${key}">${setDraft[key].map((it, i) => {
+    const used = it.id ? usedCount(key, it) : 0; const locked = used > 0 || (key === 'payments' && (it.id === 'paid' || it.id === 'unpaid'));
+    return `<div class="r" data-i="${i}"><input type="text" value="${esc(it.name)}" maxlength="30" data-f="name" aria-label="이름">
+      <label><input type="checkbox" data-f="active" ${it.active ? 'checked' : ''}>사용</label>
+      ${key === 'payments' ? `<label title="체크하면 상단 '입금 완료' 건수에 포함됩니다"><input type="checkbox" data-f="paid" ${it.paid ? 'checked' : ''}>입금완료로 집계</label>` : ''}
+      <button class="btn sm danger" data-rm ${locked ? `disabled title="${used ? `주문 ${used}건에서 사용 중 — 비활성화만 가능` : '기본 항목'}"` : ''}>삭제</button></div>`; }).join('')}
+    <button class="btn sm" data-add="${key}">＋ 추가</button></div>`;
+  $('setBody').innerHTML = sec('products', '상품 관리', '이미 주문에 쓰인 상품은 삭제할 수 없고 비활성화만 가능합니다. 이름을 바꿔도 기존 주문에 저장된 상품명은 바뀌지 않습니다.')
+    + sec('weights', '무게 관리', '변경은 이후 등록하는 주문에만 적용됩니다. 기존 주문의 무게는 자동으로 바뀌지 않습니다.')
+    + sec('payments', '입금 상태 관리', '필요한 상태를 추가할 수 있습니다. “입금완료로 집계”를 체크한 상태만 입금 완료 건수에 포함됩니다.')
+    + '<div id="setErr" class="err" hidden role="alert"></div>';
+}
+$('btnSettings').onclick = () => { if (!S.loaded || !S.settings) return toast('설정을 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.', 'bad'); setDraft = JSON.parse(JSON.stringify(S.settings)); renderSettings(); $('setDlg').showModal(); };
+$('setBody').addEventListener('input', (e) => {
+  const r = e.target.closest('.r'); if (!r) return;
+  const key = r.parentElement.dataset.sec; const it = setDraft[key][+r.dataset.i]; const f = e.target.dataset.f;
+  it[f] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+});
+$('setBody').addEventListener('click', (e) => {
+  const t = e.target;
+  if (t.dataset.add) { const k = t.dataset.add; setDraft[k].push(k === 'payments' ? { id: null, name: '', active: true, paid: false } : { id: null, name: '', active: true }); renderSettings(); $('setBody').querySelector(`[data-sec="${k}"] .r:last-of-type input`)?.focus(); }
+  if (t.hasAttribute('data-rm')) { const r = t.closest('.r'); setDraft[r.parentElement.dataset.sec].splice(+r.dataset.i, 1); renderSettings(); }
+});
+$('setSave').onclick = async (force) => {
+  showErr('setErr', ''); $('setSave').disabled = true;
+  try {
+    await mutate({ op: 'saveSettings', baseRev: S.settings.rev, settings: setDraft, force: force === true });
+    $('setDlg').close(); toast('설정을 저장했습니다.', 'ok');
+  } catch (e) {
+    if (e.status === 409 && e.data.code === 'conflict') {
+      if (await confirmBox('설정 충돌', '<p>다른 사용자가 설정을 먼저 변경했습니다.</p><p>내 변경으로 덮어쓰시겠습니까? (취소하면 입력 내용은 유지됩니다)</p>', '덮어쓰기')) {
+        if (S.settings) S.settings.rev = e.data.current.rev; $('setSave').disabled = false; return $('setSave').onclick(true);
+      }
+    } else showErr('setErr', e.message);
+  }
+  $('setSave').disabled = false;
+};
+
+/* ==========================================================================
+   엑셀 내보내기
+   ========================================================================== */
+$('btnExport').onclick = () => { showErr('expErr', ''); $('expFiltered').textContent = `현재 검색·필터 결과만 내보내기 (${filtered().length}건)`; $('expDlg').showModal(); };
+let xlsxLoading;
+function loadXlsxLib() {
+  if (window.XLSX) return Promise.resolve();
+  xlsxLoading ||= new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = resolve;
+    s.onerror = () => { xlsxLoading = null; reject(new Error('엑셀 라이브러리(SheetJS)를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.')); };
+    document.head.appendChild(s);
+  });
+  return xlsxLoading;
+}
+async function doExport(ids, label) {
+  showErr('expErr', ''); $('expAll').disabled = $('expFiltered').disabled = true;
+  try {
+    await loadXlsxLib();
+    const d = readAll(); // 저장된 최신 데이터 기준
+    const set = ids ? new Set(ids) : null;
+    const rows = d.orders.filter((o) => !set || set.has(o.id)).sort((a, b) => a.no - b.no);
+    const payName = Object.fromEntries(d.settings.payments.map((p) => [p.id, p.name]));
+    const aoa = [['번호', '받는 분', '연락처', '주소', '상품명', '무게', '입금 여부', '보내는 분', '메모', '등록일'],
+      ...rows.map((o) => [o.no, o.name, String(o.phone), o.address, o.product, o.weight, payName[o.payment] || o.payment || '', o.sender || '', o.memo || '', kstDateTime.format(new Date(o.createdAt))])];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    // 연락처·날짜 열은 문자열 셀로 고정(0 이 잘리지 않게)
+    for (let r = 1; r < aoa.length; r++) for (const c of [2, 8, 9]) { const ref = XLSX.utils.encode_cell({ r, c }); if (ws[ref]) { ws[ref].t = 's'; ws[ref].z = '@'; } }
+    ws['!cols'] = [8, 16, 18, 55, 12, 10, 12, 16, 40, 18].map((wch) => ({ wch }));
+    ws['!autofilter'] = { ref: `A1:J${Math.max(1, aoa.length)}` };
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '주문목록');
+    XLSX.writeFile(wb, `귤을싸자_${label}_${kstDate.format(new Date())}.xlsx`);
+    $('expDlg').close(); toast(`${rows.length}건을 엑셀 파일로 저장했습니다. 다운로드한 파일을 열어 확인하세요.`, 'ok');
+  } catch (e) { showErr('expErr', '내보내기 실패: ' + e.message); }
+  $('expAll').disabled = $('expFiltered').disabled = false;
+}
+$('expAll').onclick = () => doExport(null, '주문목록');
+$('expFiltered').onclick = () => {
+  const ids = filtered().map((o) => o.id);
+  if (!ids.length) return showErr('expErr', '내보낼 검색 결과가 없습니다.');
+  doExport(ids, '검색결과');
+};
+
+/* 백업(JSON) / 복원: 브라우저 데이터가 지워질 때를 대비 */
+$('bkSave').onclick = () => {
+  try {
+    const d = readAll();
+    const blob = new Blob([JSON.stringify({ app: 'gyul', savedAt: new Date().toISOString(), orders: d.orders, trash: d.trash, settings: d.settings }, null, 1)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `귤을싸자_백업_${kstDate.format(new Date())}.json`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    toast('백업 파일을 저장했습니다.', 'ok');
+  } catch (e) { showErr('expErr', '백업 실패: ' + e.message); }
+};
+$('bkLoad').onclick = () => $('bkFile').click();
+$('bkFile').onchange = async (e) => {
+  const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+  try {
+    const j = JSON.parse(await file.text());
+    if (j?.app !== 'gyul' || !Array.isArray(j.orders) || !Array.isArray(j.trash) || !j.settings || !Array.isArray(j.settings.products) || !Array.isArray(j.settings.weights) || !Array.isArray(j.settings.payments)) throw new Error('귤을 싸자 백업 파일이 아닙니다.');
+    if (!await confirmBox('백업 복원', `<p>백업 파일(주문 ${j.orders.length}건, 휴지통 ${j.trash.length}건)로 <b>현재 데이터를 모두 교체</b>합니다.</p><p class="hint">복원 전에 현재 데이터를 먼저 백업해 두는 것을 권장합니다.</p>`, '복원')) return;
+    lsSet({ [KEY.orders]: j.orders, [KEY.trash]: j.trash, [KEY.settings]: j.settings });
+    await load(); $('expDlg').close(); toast('백업을 복원했습니다.', 'ok');
+  } catch (er) { showErr('expErr', '복원 실패: ' + er.message); }
+};
+
+/* ==========================================================================
+   시작
+   ========================================================================== */
+if (authed()) load(); else showLogin();
+</script>
+</body>
+</html>
